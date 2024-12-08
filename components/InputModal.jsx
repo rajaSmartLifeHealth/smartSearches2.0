@@ -1,19 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function InputModal({ isOpen, closeModal, title, placeholder, onSubmit }) {
+export default function InputModal({ isOpen, closeModal, title, placeholder, onSubmit, endpoint }) {
   const [inputValue, setInputValue] = useState("");
   const [values, setValues] = useState([]);
 
-  const handleAddValue = () => {
-    if (inputValue.trim()) {
-      setValues([...values, inputValue.trim()]);
-      setInputValue("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && endpoint) {
+      setIsLoading(true);
+      const token = localStorage.getItem("authToken"); // Retrieve the token from localStorage
+      console.log(token);
+      fetch(endpoint, {
+        method: "GET",
+        headers: {
+         "Content-Type": "application/json",
+         authorization: `Bearer ${token}`
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setValues(Array.isArray(data) ? data : []);
+        })
+        .catch((error) => console.error("Error fetching data:", error))
+        .finally(() => setIsLoading(false));
+    }
+  }, [isOpen, endpoint]);
+
+  const handleSubmit = () => {
+    if (endpoint) {
+      setIsSubmitting(true);
+      const token = localStorage.getItem("authToken"); // Retrieve the token from localStorage
+      console.log(token);
+
+      fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`
+          // Include the token in the Authorization header
+        },
+        body: JSON.stringify({ values }),
+      })
+        .then((response) => {
+          if (response.ok) return response.json();
+          throw new Error("Failed to submit data");
+        })
+        .then((result) => {
+          console.log("Data successfully submitted:", result);
+          onSubmit(values);
+          closeModal();
+        })
+        .catch((error) => console.error("Error posting data:", error))
+        .finally(() => setIsSubmitting(false));
     }
   };
 
-  const handleSubmit = () => {
-    onSubmit(values); // Pass values to the parent
-    closeModal(); // Close the modal
+  const handleAddValue = () => {
+    if (inputValue.trim() && !values.includes(inputValue.trim())) {
+      setValues([...values, inputValue.trim()]);
+      setInputValue("");
+    }
   };
 
   return isOpen ? (
@@ -32,20 +80,24 @@ export default function InputModal({ isOpen, closeModal, title, placeholder, onS
         </button>
         <div className="values-container">
           <h3>Values Added:</h3>
-          <ul className="values-list">
-            {values.map((value, index) => (
-              <li key={index} className="value-item">
-                {value}
-              </li>
-            ))}
-          </ul>
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <ul className="values-list">
+              {values.map((value, index) => (
+                <li key={index} className="value-item">
+                  {value.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="modal-buttons">
           <button className="close-button" onClick={closeModal}>
             Close
           </button>
-          <button className="submit-button" onClick={handleSubmit}>
-            Submit
+          <button className="submit-button" onClick={handleSubmit} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>

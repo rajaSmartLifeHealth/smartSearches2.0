@@ -18,6 +18,16 @@ export default function App() {
     metricName: [],
   });
 
+  const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api/";
+
+  const endpoints = {
+    category: `${baseEndpoint}categories`,
+    recordName: `${baseEndpoint}records`,
+    hospitalName: `${baseEndpoint}practices`,
+    patientName: `${baseEndpoint}patients`,
+    metricName: `${baseEndpoint}metrics`,
+  };
+
   const openModal = (field) => {
     setModals({ ...modals, [field]: true });
   };
@@ -28,6 +38,13 @@ export default function App() {
 
   const handleSubmit = (field, values) => {
     setData({ ...data, [field]: values });
+  };
+
+  const handleLogout = () => {
+    // Remove token from localStorage and optionally reset the state
+    localStorage.removeItem("authToken");
+    alert("You have been logged out.");
+      window.location.href = '/login';
   };
 
   return (
@@ -49,6 +66,10 @@ export default function App() {
         <button className="main-button" onClick={() => openModal("metricName")}>
           Add Metric Name
         </button>
+        {/* Logout button */}
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
 
       {/* Display Data */}
@@ -58,41 +79,17 @@ export default function App() {
       </div>
 
       {/* Modals */}
-      <InputModal
-        isOpen={modals.category}
-        closeModal={() => closeModal("category")}
-        title="Add KPI Categories"
-        placeholder="Enter a KPI Category"
-        onSubmit={(values) => handleSubmit("category", values)}
-      />
-      <InputModal
-        isOpen={modals.recordName}
-        closeModal={() => closeModal("recordName")}
-        title="Add KPI Record Names"
-        placeholder="Enter a KPI Record Name"
-        onSubmit={(values) => handleSubmit("recordName", values)}
-      />
-      <InputModal
-        isOpen={modals.hospitalName}
-        closeModal={() => closeModal("hospitalName")}
-        title="Add Hospital Names"
-        placeholder="Enter a Hospital Name"
-        onSubmit={(values) => handleSubmit("hospitalName", values)}
-      />
-      <InputModal
-        isOpen={modals.patientName}
-        closeModal={() => closeModal("patientName")}
-        title="Add Patient Names"
-        placeholder="Enter a Patient Name"
-        onSubmit={(values) => handleSubmit("patientName", values)}
-      />
-      <InputModal
-        isOpen={modals.metricName}
-        closeModal={() => closeModal("metricName")}
-        title="Add Metric Names"
-        placeholder="Enter a Metric Name"
-        onSubmit={(values) => handleSubmit("metricName", values)}
-      />
+      {Object.keys(modals).map((field) => (
+        <InputModal
+          key={field}
+          isOpen={modals[field]}
+          closeModal={() => closeModal(field)}
+          title={`Add ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+          placeholder={`Enter a ${field}`}
+          endpoint={endpoints[field]}
+          onSubmit={(values) => handleSubmit(field, values)}
+        />
+      ))}
     </div>
   );
 }
