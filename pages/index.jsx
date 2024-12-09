@@ -14,7 +14,7 @@ export default function App() {
     "patientName",
     "metricName",
   ]; // Define the order of steps
-  const [currentStep, setCurrentStep] = useState(0); 
+  const [currentStep, setCurrentStep] = useState(null); 
   const [showDashboard, setShowDashboard] = useState(false); // Toggle KPI Dashboard
 
   const [data, setData] = useState({
@@ -28,8 +28,15 @@ export default function App() {
   const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api";
 
   const startNewKpi = () => {
-    setCurrentStep(0);
-    setShowDashboard(false); 
+    setData({
+      category: [],
+      recordName: [],
+      hospitalName: [],
+      patientName: [],
+      metricName: [],
+    }); // Reset the data to clear any previous KPI entries
+    setCurrentStep(0); // Start from category
+    setShowDashboard(false); // Hide the dashboard
   };
 
   const handleSubmit = (field, values) => {
@@ -45,7 +52,7 @@ export default function App() {
       setCurrentStep(nextStep); // Go to the next modal
     } else {
       setCurrentStep(null); 
-      setShowDashboard(true); 
+      setShowDashboard(true); // Show the KPI Dashboard when all steps are completed
     }
   };
 

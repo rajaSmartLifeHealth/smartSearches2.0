@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import AuthApp from "../components/AuthApp"; // Authentication component
+import TreeViewComponent from "../components/treeViewComponent";
+
 import "../styles/globals.css";
 import "../styles/App.css";
 import "../styles/practiceModal.css";
@@ -8,6 +10,9 @@ import "../styles/metricModal.css";
 import "../styles/patientModal.css";
 import "../styles/recordModal.css"
 import "../styles/AuthApp.css";
+import "../styles/KpiDashboard.css";
+import "../styles/TreeViewComponent.css";
+import "../styles/index.css";
 
 import axios from "axios"; // For API calls
 
