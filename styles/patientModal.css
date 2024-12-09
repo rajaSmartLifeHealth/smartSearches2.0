@@ -1,0 +1,142 @@
+/* Modal Container */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure modal is on top of other elements */
+  padding: 20px;
+}
+
+/* Modal Content */
+.modal > div {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Allow scrolling if content is too long */
+}
+
+/* Modal Header */
+.modal h2 {
+  margin-top: 0;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+}
+
+/* Input fields and select box */
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Button styling */
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* List styling */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+
+/* Medical Records Section */
+.medical-records-section {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.medical-records-section h3 {
+  font-size: 18px;
+  color: #333;
+}
+
+.medical-records-section input[type="text"] {
+  width: calc(100% - 90px);
+  margin-right: 10px;
+}
+
+.medical-records-section button {
+  width: 80px;
+  padding: 8px;
+  font-size: 14px;
+  background-color: #28a745;
+}
+
+.medical-records-section button:hover {
+  background-color: #218838;
+}
+
+/* Close Button */
+button.close {
+  background-color: #dc3545;
+  margin-top: 15px;
+}
+
+button.close:hover {
+  background-color: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .modal > div {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .medical-records-section input[type="text"] {
+    width: calc(100% - 70px);
+  }
+}

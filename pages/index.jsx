@@ -1,14 +1,21 @@
 import { useState } from "react";
-import InputModal from "../components/InputModal";
+import CategoryModal from "../components/modals/categoryModal";
+import RecordModal from "../components/modals/recordModal";
+import PracticeModal from "../components/modals/practiceModal";
+import PatientModal from "../components/modals/patientModal";
+import MetricModal from "../components/modals/metricModal";
+import KpiDashboard from "../components/KpiDashboard"; // Import KPI Dashboard
 
 export default function App() {
-  const [modals, setModals] = useState({
-    category: false,
-    recordName: false,
-    hospitalName: false,
-    patientName: false,
-    metricName: false,
-  });
+  const steps = [
+    "category",
+    "recordName",
+    "hospitalName",
+    "patientName",
+    "metricName",
+  ]; // Define the order of steps
+  const [currentStep, setCurrentStep] = useState(0); 
+  const [showDashboard, setShowDashboard] = useState(false); // Toggle KPI Dashboard
 
   const [data, setData] = useState({
     category: [],
@@ -18,78 +25,138 @@ export default function App() {
     metricName: [],
   });
 
-  const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api/";
+  const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api";
 
-  const endpoints = {
-    category: `${baseEndpoint}categories`,
-    recordName: `${baseEndpoint}records`,
-    hospitalName: `${baseEndpoint}practices`,
-    patientName: `${baseEndpoint}patients`,
-    metricName: `${baseEndpoint}metrics`,
-  };
-
-  const openModal = (field) => {
-    setModals({ ...modals, [field]: true });
-  };
-
-  const closeModal = (field) => {
-    setModals({ ...modals, [field]: false });
+  const startNewKpi = () => {
+    setCurrentStep(0);
+    setShowDashboard(false); 
   };
 
   const handleSubmit = (field, values) => {
-    setData({ ...data, [field]: values });
+    // Save the data for the current step
+    setData((prevData) => ({
+      ...prevData,
+      [field]: [...prevData[field], ...values],
+    }));
+
+    // Move to the next step if not at the last step
+    const nextStep = steps.indexOf(field) + 1;
+    if (nextStep < steps.length) {
+      setCurrentStep(nextStep); // Go to the next modal
+    } else {
+      setCurrentStep(null); 
+      setShowDashboard(true); 
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentStep(null); // Close the current modal
   };
 
   const handleLogout = () => {
-    // Remove token from localStorage and optionally reset the state
     localStorage.removeItem("authToken");
     alert("You have been logged out.");
-      window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   return (
     <div className="app-container">
       <h1 className="app-title">SmartSearches 2.0</h1>
-      <div className="buttons-container">
-        <button className="main-button" onClick={() => openModal("category")}>
-          Add KPI Category
-        </button>
-        <button className="main-button" onClick={() => openModal("recordName")}>
-          Add KPI Record Name
-        </button>
-        <button className="main-button" onClick={() => openModal("hospitalName")}>
-          Add Hospital Name
-        </button>
-        <button className="main-button" onClick={() => openModal("patientName")}>
-          Add Patient Name
-        </button>
-        <button className="main-button" onClick={() => openModal("metricName")}>
-          Add Metric Name
-        </button>
-        {/* Logout button */}
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
 
-      {/* Display Data */}
-      <div className="data-container">
-        <h2>Stored Data:</h2>
-        <pre className="data-display">{JSON.stringify(data, null, 2)}</pre>
-      </div>
+      {/* Start New KPI or Show Dashboard */}
+      {!currentStep && !showDashboard && (
+        <div className="start-options">
+          <button className="main-button" onClick={startNewKpi}>
+            Start New KPI
+          </button>
+          <button
+            className="view-dashboard-button"
+            onClick={() => setShowDashboard(true)}
+          >
+            View Dashboard
+          </button>
+        </div>
+      )}
 
-      {/* Modals */}
-      {Object.keys(modals).map((field) => (
-        <InputModal
-          key={field}
-          isOpen={modals[field]}
-          closeModal={() => closeModal(field)}
-          title={`Add ${field.charAt(0).toUpperCase() + field.slice(1)}`}
-          placeholder={`Enter a ${field}`}
-          endpoint={endpoints[field]}
-          onSubmit={(values) => handleSubmit(field, values)}
-        />
-      ))}
+      {/* Show KPI Dashboard */}
+      {showDashboard && (
+        <>
+          <KpiDashboard data={data} />
+          <button
+            className="back-button"
+            onClick={() => setShowDashboard(false)}
+          >
+            Back to Start
+          </button>
+        </>
+      )}
+
+      {/* Workflow Steps */}
+      {!showDashboard && currentStep !== null && (
+        <>
+          <div className="workflow-instructions">
+            <p>
+              Step {currentStep + 1} of {steps.length}:{" "}
+              {steps[currentStep].charAt(0).toUpperCase() +
+                steps[currentStep].slice(1)}
+            </p>
+          </div>
+
+          {/* Modals */}
+          {currentStep === 0 && (
+            <CategoryModal
+              isOpen={currentStep === 0}
+              closeModal={closeModal} // Allow closing modal
+              endpoint={baseEndpoint}
+              onSubmit={(values) => handleSubmit("category", values)}
+            />
+          )}
+          {currentStep === 1 && (
+            <RecordModal
+              isOpen={currentStep === 1}
+              closeModal={closeModal} // Allow closing modal
+              endpoint={baseEndpoint}
+              onSubmit={(values) => handleSubmit("recordName", values)}
+            />
+          )}
+          {currentStep === 2 && (
+            <PracticeModal
+              isOpen={currentStep === 2}
+              closeModal={closeModal} // Allow closing modal
+              endpoint={baseEndpoint}
+              onSubmit={(values) => handleSubmit("hospitalName", values)}
+            />
+          )}
+          {currentStep === 3 && (
+            <PatientModal
+              isOpen={currentStep === 3}
+              closeModal={closeModal} // Allow closing modal
+              endpoint={baseEndpoint}
+              onSubmit={(values) => handleSubmit("patientName", values)}
+            />
+          )}
+          {currentStep === 4 && (
+            <MetricModal
+              isOpen={currentStep === 4}
+              closeModal={closeModal} // Allow closing modal
+              endpoint={baseEndpoint}
+              onSubmit={(values) => handleSubmit("metricName", values)}
+            />
+          )}
+
+          {/* Show KPI Dashboard Button */}
+          <button
+            className="view-dashboard-button"
+            onClick={() => setShowDashboard(true)}
+          >
+            View KPI Dashboard
+          </button>
+        </>
+      )}
+
+      <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 }

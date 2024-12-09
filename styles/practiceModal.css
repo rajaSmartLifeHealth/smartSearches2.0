@@ -1,0 +1,133 @@
+/* Modal overlay to cover the entire screen */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's above other elements */
+  padding: 20px;
+}
+
+/* Modal content container */
+.modal > div {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  width: 400px;
+  max-width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Modal heading */
+.modal h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #007bff; /* Blue color for heading */
+}
+
+/* Input and Select fields */
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.modal input:focus,
+.modal select:focus {
+  border-color: #007bff; /* Highlight input/select on focus */
+  outline: none;
+}
+
+/* Add Practice button */
+.modal button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #28a745; /* Green color for add button */
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Add Practice button hover */
+.modal button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+/* Loading state */
+.modal p {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+/* List of practices */
+.modal ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal ul li {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* Close button styling */
+.modal button:last-child {
+  background-color: #dc3545; /* Red color for close button */
+  margin-top: 20px;
+}
+
+.modal button:last-child:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+/* Animation for modal appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive styling for small screens */
+@media (max-width: 600px) {
+  .modal > div {
+    width: 90%; /* Adjust modal width for smaller screens */
+    padding: 20px;
+  }
+
+  .modal h2 {
+    font-size: 1.5rem; /* Smaller font for headings on mobile */
+  }
+
+  .modal input,
+  .modal select {
+    font-size: 0.9rem; /* Adjust font size for inputs/select */
+  }
+
+  .modal button {
+    font-size: 0.9rem; /* Adjust font size for buttons */
+  }
+}

@@ -26,6 +26,7 @@ export default function AuthApp() {
             console.log(data);
           localStorage.setItem("authToken", data.token);
         }
+
       } else {
         const error = await response.json();
         alert(error.message || "An error occurred.");
