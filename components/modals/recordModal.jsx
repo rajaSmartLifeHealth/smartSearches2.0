@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) {
   const [recordName, setRecordName] = useState("");
-  const [category, setcategory] = useState("");
+  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -14,10 +14,22 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
 
     // Retrieve token from localStorage
     const token = localStorage.getItem('authToken');
+    if (!token) {
+      setError("No token found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
+    // Validate form fields
+    if (!recordName.trim() || !category.trim()) {
+      setError("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
-        endpoint + '/records',
+        `${endpoint}/records`,
         { name: recordName, category },
         {
           headers: {
@@ -26,10 +38,15 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
           },
         }
       );
-      onSubmit(response.data); // Pass the newly added record to parent
+
+      // Pass the newly added record to the parent component
+      if (onSubmit) {
+        onSubmit(response.data);
+      }
+
       setRecordName("");
-      setcategory("");
-      closeModal();
+      setCategory("");
+      closeModal(); // Close the modal after successful submission
     } catch (err) {
       setError("Failed to save the record. Please try again.");
       console.error("Error submitting record:", err);
@@ -59,9 +76,9 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
           <div className="form-group">
             <label htmlFor="category">Category</label>
             <textarea
-              id="description"
+              id="category"
               value={category}
-              onChange={(e) => setcategory(e.target.value)}
+              onChange={(e) => setCategory(e.target.value)}
               placeholder="Enter a brief category"
               rows="3"
               required
@@ -72,7 +89,7 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
             <button type="submit" disabled={loading}>
               {loading ? "Saving..." : "Save"}
             </button>
-            <button type="button" onClick={closeModal}>
+            <button type="button" onClick={closeModal} disabled={loading}>
               Cancel
             </button>
           </div>
@@ -81,4 +98,3 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
     </div>
   );
 }
-

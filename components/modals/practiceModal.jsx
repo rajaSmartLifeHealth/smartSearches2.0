@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 
-export default function PracticeModal({ isOpen, closeModal, endpoint }) {
+export default function PracticeModal({ isOpen, closeModal, endpoint, onSubmit }) {
   const [practices, setPractices] = useState([]);
   const [practiceName, setPracticeName] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(""); // For error handling
 
   // Fetch categories and practices
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
+      setError(""); // Clear any previous error when re-opening the modal
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("No token found. Please log in again.");
@@ -30,70 +32,108 @@ export default function PracticeModal({ isOpen, closeModal, endpoint }) {
           setCategories(categoriesData);
           setPractices(practicesData);
         })
-        .catch((err) => console.error(err))
+        .catch((err) => {
+          setError("Error fetching data.");
+          console.error(err);
+        })
         .finally(() => setIsLoading(false));
     }
   }, [isOpen, endpoint]);
 
   // Add a new practice
   const handleAddPractice = () => {
-    const token = localStorage.getItem("authToken"); // Retrieve token from localStorage
+    if (!practiceName.trim() || !selectedCategory) {
+      setError("Please fill in both fields.");
+      return;
+    }
+
+    const token = localStorage.getItem("authToken");
     if (!token) {
       console.error("No token found. Please log in again.");
       return;
     }
 
+    const payload = {
+      name: practiceName,
+      category: selectedCategory,
+    };
+
+    setIsLoading(true);
+
     fetch(`${endpoint}/practices`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Include token in Authorization header
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ name: practiceName, category: selectedCategory }),
+      body: JSON.stringify(payload),
     })
       .then((res) => res.json())
       .then((newPractice) => {
         setPractices([...practices, newPractice]);
-        setPracticeName("");
-        setSelectedCategory("");
+        setPracticeName(""); // Clear the practice name input field
+        setSelectedCategory(""); // Reset the selected category field
+        onSubmit && onSubmit(newPractice); // Call onSubmit if provided (for parent handling)
+        setError(""); // Clear error if successful
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        setError("Error adding practice.");
+        console.error(err);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return isOpen ? (
     <div className="modal">
-      <h2>Manage Practices</h2>
-      <input
-        type="text"
-        value={practiceName}
-        onChange={(e) => setPracticeName(e.target.value)}
-        placeholder="Enter practice name"
-      />
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-      >
-        <option value="" disabled>
-          Select Category
-        </option>
-        {categories.map((cat) => (
-          <option key={cat._id} value={cat.name}>
-            {cat.name}
+      <div className="modal-content">
+        <h2>Manage Practices</h2>
+
+        {/* Display error message */}
+        {error && <p className="error-message">{error}</p>}
+
+        <input
+          type="text"
+          value={practiceName}
+          onChange={(e) => setPracticeName(e.target.value)}
+          placeholder="Enter practice name"
+          disabled={isLoading}
+        />
+
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          disabled={isLoading}
+        >
+          <option value="" disabled>
+            Select Category
           </option>
-        ))}
-      </select>
-      <button onClick={handleAddPractice}>Add Practice</button>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {practices.map((practice) => (
-            <li key={practice._id}>{practice.name}</li>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat.name}>
+              {cat.name}
+            </option>
           ))}
-        </ul>
-      )}
-      <button onClick={closeModal}>Close</button>
+        </select>
+
+        <button onClick={handleAddPractice} disabled={isLoading}>
+          {isLoading ? "Adding Practice..." : "Add Practice"}
+        </button>
+
+        {isLoading ? (
+          <p>Loading...</p> // Show loading text while data is being fetched
+        ) : (
+          <ul>
+            {practices.map((practice) => (
+              <li key={practice._id}>
+                {practice.name} (Category: {practice.category || "No Category"})
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <button onClick={closeModal} disabled={isLoading}>
+          Close
+        </button>
+      </div>
     </div>
   ) : null;
 }
-

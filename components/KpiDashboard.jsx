@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TreeViewComponent from "./TreeViewComponent"; // Import the reusable component
+import TreeViewComponent from "./treeViewComponent"; // Import the reusable component
 
 export default function KpiDashboard() {
   const [data, setData] = useState([]);

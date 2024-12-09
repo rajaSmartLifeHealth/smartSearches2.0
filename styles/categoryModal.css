@@ -5,11 +5,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgb(234, 227, 227); /* Semi-transparent background */
+  background: rgb(41, 35, 35); 
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure modal is on top of other elements */
+  z-index: 1000; 
   padding: 20px;
 }
 
@@ -81,7 +81,6 @@
   background-color: #c82333;
 }
 
-/* Loader Styles */
 .loader {
   width: 24px;
   height: 24px;

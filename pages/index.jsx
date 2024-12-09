@@ -9,20 +9,20 @@ import KpiDashboard from "../components/KpiDashboard"; // Import KPI Dashboard
 export default function App() {
   const steps = [
     "category",
-    "recordName",
-    "hospitalName",
-    "patientName",
-    "metricName",
+    "record",
+    "practice",
+    "patient",
+    "metric",
   ]; // Define the order of steps
   const [currentStep, setCurrentStep] = useState(null); 
   const [showDashboard, setShowDashboard] = useState(false); // Toggle KPI Dashboard
 
   const [data, setData] = useState({
     category: [],
-    recordName: [],
-    hospitalName: [],
-    patientName: [],
-    metricName: [],
+    record: [],
+    practice: [],
+    patient: [],
+    metric: [],
   });
 
   const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api";
@@ -30,10 +30,10 @@ export default function App() {
   const startNewKpi = () => {
     setData({
       category: [],
-      recordName: [],
-      hospitalName: [],
-      patientName: [],
-      metricName: [],
+      record: [],
+      practice: [],
+      patient: [],
+      metric: [],
     }); // Reset the data to clear any previous KPI entries
     setCurrentStep(0); // Start from category
     setShowDashboard(false); // Hide the dashboard
@@ -70,7 +70,6 @@ export default function App() {
     <div className="app-container">
       <h1 className="app-title">SmartSearches 2.0</h1>
 
-      {/* Start New KPI or Show Dashboard */}
       {!currentStep && !showDashboard && (
         <div className="start-options">
           <button className="main-button" onClick={startNewKpi}>
@@ -109,7 +108,6 @@ export default function App() {
             </p>
           </div>
 
-          {/* Modals */}
           {currentStep === 0 && (
             <CategoryModal
               isOpen={currentStep === 0}
@@ -123,7 +121,7 @@ export default function App() {
               isOpen={currentStep === 1}
               closeModal={closeModal} // Allow closing modal
               endpoint={baseEndpoint}
-              onSubmit={(values) => handleSubmit("recordName", values)}
+              onSubmit={(values) => handleSubmit("record", values)}
             />
           )}
           {currentStep === 2 && (
@@ -131,7 +129,7 @@ export default function App() {
               isOpen={currentStep === 2}
               closeModal={closeModal} // Allow closing modal
               endpoint={baseEndpoint}
-              onSubmit={(values) => handleSubmit("hospitalName", values)}
+              onSubmit={(values) => handleSubmit("practice", values)}
             />
           )}
           {currentStep === 3 && (
@@ -139,19 +137,18 @@ export default function App() {
               isOpen={currentStep === 3}
               closeModal={closeModal} // Allow closing modal
               endpoint={baseEndpoint}
-              onSubmit={(values) => handleSubmit("patientName", values)}
+              onSubmit={(values) => handleSubmit("patient", values)}
             />
           )}
           {currentStep === 4 && (
             <MetricModal
               isOpen={currentStep === 4}
-              closeModal={closeModal} // Allow closing modal
+              closeModal={closeModal} 
               endpoint={baseEndpoint}
-              onSubmit={(values) => handleSubmit("metricName", values)}
+              onSubmit={(values) => handleSubmit("metric", values)}
             />
           )}
 
-          {/* Show KPI Dashboard Button */}
           <button
             className="view-dashboard-button"
             onClick={() => setShowDashboard(true)}
