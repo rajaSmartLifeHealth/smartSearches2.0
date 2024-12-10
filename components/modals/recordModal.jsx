@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) {
+export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit, moveToNextStep }) {
   const [recordName, setRecordName] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,6 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
     setLoading(true);
     setError("");
 
-    // Retrieve token from localStorage
     const token = localStorage.getItem('authToken');
     if (!token) {
       setError("No token found. Please log in again.");
@@ -20,7 +19,6 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
       return;
     }
 
-    // Validate form fields
     if (!recordName.trim() || !category.trim()) {
       setError("Please fill in all fields.");
       setLoading(false);
@@ -34,19 +32,23 @@ export default function RecordModal({ isOpen, closeModal, endpoint, onSubmit }) 
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include token in Authorization header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      // Pass the newly added record to the parent component
       if (onSubmit) {
-        onSubmit(response.data);
+        onSubmit(response.data); // Notify parent that the record was created
+      }
+
+      // Move to the next step (e.g., practices)
+      if (moveToNextStep) {
+        moveToNextStep();
       }
 
       setRecordName("");
       setCategory("");
-      closeModal(); // Close the modal after successful submission
+      closeModal(); // Close the modal after submission
     } catch (err) {
       setError("Failed to save the record. Please try again.");
       console.error("Error submitting record:", err);

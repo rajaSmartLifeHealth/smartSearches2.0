@@ -1,96 +1,125 @@
-/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgb(41, 35, 35); 
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; 
-  padding: 20px;
+  z-index: 1000;
 }
 
-.modal > div {
-  background-color: #fff;
+.modal-content {
+  background: #ffffff;
+  width: 400px;
   padding: 20px;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+  animation: slide-down 0.3s ease-out;
 }
 
-.modal h2 {
-  margin-bottom: 20px;
+@keyframes slide-down {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+h2 {
   font-size: 1.5rem;
+  color: #333333;
+  margin-bottom: 20px;
 }
 
-.modal input {
-  width: 80%;
+input[type="text"] {
+  width: calc(100% - 20px);
   padding: 10px;
-  margin: 10px 0;
+  border: 2px solid #008cba;
   border-radius: 5px;
-  border: 1px solid #ccc;
   font-size: 1rem;
+  margin-bottom: 20px;
 }
 
-.modal button {
+input[type="text"]:focus {
+  outline: none;
+  border-color: #005f8a;
+  box-shadow: 0 0 5px #005f8a;
+}
+
+button {
   padding: 10px 20px;
-  border: none;
-  background-color: #007BFF;
-  color: #fff;
-  border-radius: 5px;
   font-size: 1rem;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  margin: 10px 5px;
-  transition: background-color 0.3s ease;
+  margin: 5px;
 }
 
-.modal button:hover {
-  background-color: #0056b3;
+button:hover {
+  opacity: 0.9;
 }
 
-.modal ul {
+button:disabled {
+  cursor: not-allowed;
+  background: #cccccc;
+}
+
+button:not(:disabled) {
+  background-color: #008cba;
+  color: white;
+  font-weight: bold;
+}
+
+button.delete {
+  background-color: #f44336;
+  color: white;
+}
+
+button.delete:hover {
+  background-color: #d32f2f;
+}
+
+ul {
   list-style-type: none;
   padding: 0;
+  margin: 20px 0;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
-.modal ul li {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+ul li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.modal ul li button {
-  padding: 5px 10px;
-  background-color: #DC3545;
-  border: none;
+  background: #f9f9f9;
+  padding: 10px;
   border-radius: 5px;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+  border: 1px solid #e0e0e0;
 }
 
-.modal ul li button:hover {
-  background-color: #c82333;
+ul li:hover {
+  background: #f1f1f1;
 }
 
-.loader {
-  width: 24px;
-  height: 24px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007BFF;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+ul li button {
+  font-size: 0.8rem;
+  padding: 5px 10px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.error-message {
+  color: #f44336;
+  background-color: #ffe6e6;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
+  margin-bottom: 20px;
+  text-align: left;
 }

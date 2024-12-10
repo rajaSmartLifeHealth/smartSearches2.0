@@ -8,18 +8,18 @@ export default function PracticeModal({ isOpen, closeModal, endpoint, onSubmit }
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(""); // For error handling
 
-  // Fetch categories and practices
+  // 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
-      setError(""); // Clear any previous error when re-opening the modal
+      setError(""); // Clea
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("No token found. Please log in again.");
         return;
       }
 
-      // Fetch categories and practices with Authorization header
+    
       Promise.all([
         fetch(`${endpoint}/categories`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -71,10 +71,10 @@ export default function PracticeModal({ isOpen, closeModal, endpoint, onSubmit }
       .then((res) => res.json())
       .then((newPractice) => {
         setPractices([...practices, newPractice]);
-        setPracticeName(""); // Clear the practice name input field
-        setSelectedCategory(""); // Reset the selected category field
-        onSubmit && onSubmit(newPractice); // Call onSubmit if provided (for parent handling)
-        setError(""); // Clear error if successful
+        setPracticeName(""); 
+        setSelectedCategory(""); 
+        onSubmit && onSubmit(newPractice); 
+        setError(""); 
       })
       .catch((err) => {
         setError("Error adding practice.");

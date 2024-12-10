@@ -8,28 +8,25 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [newRecord, setNewRecord] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(""); // For error handling
+  const [error, setError] = useState("");
 
-  // Get token from localStorage
   const token = localStorage.getItem("authToken");
 
-  // Fetch patients and practices with token authorization
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
-      setError(""); // Clear any previous errors when re-opening the modal
+      setError("");
+      setPatientName("");
+      setSelectedPractice("");
+      setMedicalRecords([]);
 
+      // Fetch patients and practices data
       Promise.all([
         fetch(`${endpoint}/patients`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to headers
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }).then((res) => res.json()),
-
         fetch(`${endpoint}/practices`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to headers
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }).then((res) => res.json()),
       ])
         .then(([patientsData, practicesData]) => {
@@ -37,14 +34,13 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
           setPractices(practicesData);
         })
         .catch((err) => {
-          setError("Error fetching data");
+          setError("Error fetching data.");
           console.error(err);
         })
         .finally(() => setIsLoading(false));
     }
   }, [isOpen, endpoint, token]);
 
-  // Add a new patient with token authorization
   const handleAddPatient = () => {
     if (!patientName.trim() || !selectedPractice || medicalRecords.length === 0) {
       setError("Please fill all fields.");
@@ -63,18 +59,18 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Add token to headers
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     })
       .then((res) => res.json())
       .then((newPatient) => {
-        setPatients([...patients, newPatient]);
-        setPatientName(""); // Clear the patient name input field
-        setSelectedPractice(""); // Reset the selected practice field
-        setMedicalRecords([]); // Reset the medical records field
-        onSubmit && onSubmit(newPatient); // Call onSubmit if provided
-        setError(""); // Clear error if successful
+        setPatients((prev) => [...prev, newPatient]);
+        setPatientName("");
+        setSelectedPractice("");
+        setMedicalRecords([]);
+        setError("");
+        if (onSubmit) onSubmit(newPatient);
       })
       .catch((err) => {
         setError("Error adding patient.");
@@ -83,12 +79,24 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
       .finally(() => setIsLoading(false));
   };
 
-  // Add a new medical record
   const handleAddRecord = () => {
-    if (newRecord) {
-      setMedicalRecords([...medicalRecords, newRecord]);
-      setNewRecord(""); // Clear the new record input field
+    if (newRecord.trim()) {
+      setMedicalRecords((prev) => [...prev, newRecord.trim()]);
+      setNewRecord("");
     }
+  };
+
+  const handleRemoveRecord = (index) => {
+    setMedicalRecords((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleClose = () => {
+    setPatientName("");
+    setSelectedPractice("");
+    setMedicalRecords([]);
+    setNewRecord("");
+    setError("");
+    closeModal();
   };
 
   return isOpen ? (
@@ -96,7 +104,6 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
       <div className="modal-content">
         <h2>Manage Patients</h2>
 
-        {/* Display error message */}
         {error && <p className="error-message">{error}</p>}
 
         <input
@@ -125,7 +132,15 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
           <h3>Medical Records</h3>
           <ul>
             {medicalRecords.map((record, index) => (
-              <li key={index}>{record}</li>
+              <li key={index}>
+                {record}{" "}
+                <button
+                  onClick={() => handleRemoveRecord(index)}
+                  disabled={isLoading}
+                >
+                  Remove
+                </button>
+              </li>
             ))}
           </ul>
           <input
@@ -135,8 +150,8 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
             placeholder="Enter a new record"
             disabled={isLoading}
           />
-          <button onClick={handleAddRecord} disabled={isLoading}>
-            {isLoading ? "Adding Record..." : "Add Record"}
+          <button onClick={handleAddRecord} disabled={isLoading || !newRecord.trim()}>
+            Add Record
           </button>
         </div>
 
@@ -147,12 +162,12 @@ export default function PatientModal({ isOpen, closeModal, endpoint, onSubmit })
         <ul>
           {patients.map((patient) => (
             <li key={patient._id}>
-              {patient.name} ({patient.practice?.name || "No Practice"})
+              {patient.name} ({practices.find((p) => p._id === patient.practice)?.name || "No Practice"})
             </li>
           ))}
         </ul>
 
-        <button onClick={closeModal} disabled={isLoading}>
+        <button onClick={handleClose} disabled={isLoading}>
           Close
         </button>
       </div>

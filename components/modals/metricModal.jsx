@@ -7,27 +7,25 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(""); // For error handling
+  const [error, setError] = useState("");
 
   const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
-      setError(""); // Clear any previous errors when modal is opened
+      setError(""); // Clear error message when modal opens
+      setMetricName(""); // Reset input fields
+      setMetricValue("");
+      setSelectedPatient("");
 
-      // Fetch metrics and patients data concurrently with Authorization header
+      // Fetch metrics and patients data in parallel
       Promise.all([
         fetch(`${endpoint}/metrics`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to headers for authorization
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }).then((res) => res.json()),
-
         fetch(`${endpoint}/patients`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to headers for authorization
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }).then((res) => res.json()),
       ])
         .then(([metricsData, patientsData]) => {
@@ -35,14 +33,13 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
           setPatients(patientsData);
         })
         .catch((err) => {
-          setError("Error fetching data");
+          setError("Error fetching data.");
           console.error(err);
         })
         .finally(() => setIsLoading(false));
     }
   }, [isOpen, endpoint, token]);
 
-  // Add a new metric
   const handleAddMetric = () => {
     if (!metricName.trim() || !metricValue.trim() || !selectedPatient) {
       setError("Please fill all fields.");
@@ -57,35 +54,41 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
 
     setIsLoading(true);
 
-    // Make the POST request with Authorization header
     fetch(`${endpoint}/metrics`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Add token to headers for authorization
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     })
       .then((res) => res.json())
       .then((newMetric) => {
-        setMetrics([...metrics, newMetric]); // Add the new metric to the list
-        setMetricName(""); // Clear the metric name input field
-        setMetricValue(""); // Clear the metric value input field
-        setSelectedPatient(""); // Reset the selected patient field
-        onSubmit && onSubmit(newMetric); // Call onSubmit if provided
-        setError(""); // Clear error if successful
+        setMetrics((prev) => [...prev, newMetric]);
+        setMetricName("");
+        setMetricValue("");
+        setSelectedPatient("");
+        setError("");
+        if (onSubmit) onSubmit(newMetric); // Notify parent component
       })
       .catch((err) => {
-        setError("Error adding metric");
+        setError("Error adding metric.");
         console.error(err);
       })
       .finally(() => setIsLoading(false));
   };
 
-  // Function to get the patient's name by ID
   const getPatientNameById = (patientId) => {
     const patient = patients.find((p) => p._id === patientId);
     return patient ? patient.name : "Unknown Patient";
+  };
+
+  const handleClose = () => {
+    setMetricName("");
+    setMetricValue("");
+    setSelectedPatient("");
+    setError("");
+    closeModal();
   };
 
   return isOpen ? (
@@ -93,7 +96,6 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
       <div className="modal-content">
         <h2>Manage Metrics</h2>
 
-        {/* Display error message */}
         {error && <p className="error-message">{error}</p>}
 
         <input
@@ -130,7 +132,7 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
         </button>
 
         {isLoading ? (
-          <p>Loading...</p> // Show loading text while data is being fetched
+          <p>Loading...</p>
         ) : (
           <ul>
             {metrics.map((metric) => (
@@ -141,7 +143,7 @@ export default function MetricModal({ isOpen, closeModal, endpoint, onSubmit }) 
           </ul>
         )}
 
-        <button onClick={closeModal} disabled={isLoading}>
+        <button onClick={handleClose} disabled={isLoading}>
           Close
         </button>
       </div>

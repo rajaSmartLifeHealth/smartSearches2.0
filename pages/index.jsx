@@ -4,7 +4,7 @@ import RecordModal from "../components/modals/recordModal";
 import PracticeModal from "../components/modals/practiceModal";
 import PatientModal from "../components/modals/patientModal";
 import MetricModal from "../components/modals/metricModal";
-import KpiDashboard from "../components/KpiDashboard"; // Import KPI Dashboard
+import KpiDashboard from "../components/KpiDashboard"; 
 
 export default function App() {
   const steps = [
@@ -13,9 +13,9 @@ export default function App() {
     "practice",
     "patient",
     "metric",
-  ]; // Define the order of steps
+  ]; 
   const [currentStep, setCurrentStep] = useState(null); 
-  const [showDashboard, setShowDashboard] = useState(false); // Toggle KPI Dashboard
+  const [showDashboard, setShowDashboard] = useState(false); 
 
   const [data, setData] = useState({
     category: [],
@@ -34,30 +34,43 @@ export default function App() {
       practice: [],
       patient: [],
       metric: [],
-    }); // Reset the data to clear any previous KPI entries
-    setCurrentStep(0); // Start from category
-    setShowDashboard(false); // Hide the dashboard
+    }); 
+    setCurrentStep(0); // Start 
+    setShowDashboard(false); // 
   };
 
   const handleSubmit = (field, values) => {
-    // Save the data for the current step
+    // Ensure values is an array, even if it's a single value (non-iterable)
+    const valuesArray = Array.isArray(values) ? values : [values];
+
     setData((prevData) => ({
       ...prevData,
-      [field]: [...prevData[field], ...values],
+      [field]: [...(prevData[field] || []), ...valuesArray], // Ensure prevData[field] is an array
     }));
 
-    // Move to the next step if not at the last step
+    // Move to the next step
     const nextStep = steps.indexOf(field) + 1;
     if (nextStep < steps.length) {
-      setCurrentStep(nextStep); // Go to the next modal
+      setCurrentStep(nextStep);  // Go to next step after submitting
     } else {
-      setCurrentStep(null); 
-      setShowDashboard(true); // Show the KPI Dashboard when all steps are completed
+      // If it's the last step, move to dashboard
+      console.log("Finished all steps, showing dashboard.");
+      setShowDashboard(true);
+      setCurrentStep(null); // Reset current step to null to indicate completion
     }
   };
 
+  
+
   const closeModal = () => {
-    setCurrentStep(null); // Close the current modal
+    // Automatically move to the next step after closing the modal
+    const nextStep = currentStep + 1;
+    if (nextStep < steps.length) {
+      setCurrentStep(nextStep);  // Move to the next step
+    } else {
+      setShowDashboard(true); // If the last step, show the dashboard
+      setCurrentStep(null); // End the process
+    }
   };
 
   const handleLogout = () => {
@@ -84,7 +97,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Show KPI Dashboard */}
+  
       {showDashboard && (
         <>
           <KpiDashboard data={data} />
@@ -97,7 +110,7 @@ export default function App() {
         </>
       )}
 
-      {/* Workflow Steps */}
+     
       {!showDashboard && currentStep !== null && (
         <>
           <div className="workflow-instructions">
@@ -110,16 +123,16 @@ export default function App() {
 
           {currentStep === 0 && (
             <CategoryModal
-              isOpen={currentStep === 0}
-              closeModal={closeModal} // Allow closing modal
-              endpoint={baseEndpoint}
-              onSubmit={(values) => handleSubmit("category", values)}
-            />
+            isOpen={currentStep === 0}
+            closeModal={closeModal}
+            endpoint={baseEndpoint}
+            onSubmit={(values) => handleSubmit("category", values)}
+          />
           )}
           {currentStep === 1 && (
             <RecordModal
               isOpen={currentStep === 1}
-              closeModal={closeModal} // Allow closing modal
+              closeModal={closeModal} 
               endpoint={baseEndpoint}
               onSubmit={(values) => handleSubmit("record", values)}
             />
@@ -127,7 +140,7 @@ export default function App() {
           {currentStep === 2 && (
             <PracticeModal
               isOpen={currentStep === 2}
-              closeModal={closeModal} // Allow closing modal
+              closeModal={closeModal} 
               endpoint={baseEndpoint}
               onSubmit={(values) => handleSubmit("practice", values)}
             />
@@ -135,7 +148,7 @@ export default function App() {
           {currentStep === 3 && (
             <PatientModal
               isOpen={currentStep === 3}
-              closeModal={closeModal} // Allow closing modal
+              closeModal={closeModal} 
               endpoint={baseEndpoint}
               onSubmit={(values) => handleSubmit("patient", values)}
             />
@@ -149,12 +162,15 @@ export default function App() {
             />
           )}
 
-          <button
-            className="view-dashboard-button"
-            onClick={() => setShowDashboard(true)}
-          >
-            View KPI Dashboard
-          </button>
+        <button
+          className="view-dashboard-button"
+          onClick={() => setShowDashboard(true)}
+          disabled={currentStep !== null} 
+        >
+          View KPI Dashboard
+        </button>
+
+
         </>
       )}
 

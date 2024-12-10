@@ -89,45 +89,7 @@ body {
   }
   
   /* Modals */
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-  }
   
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 400px;
-    max-width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .modal-content button {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #0056b3;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .modal-content button:hover {
-    background-color: #004494;
-  }
-  
-  /* Back Button */
   .back-button {
     padding: 10px 20px;
     font-size: 1rem;
@@ -145,7 +107,6 @@ body {
     background-color: #5a6268;
   }
   
-  /* Responsive Design */
   @media (max-width: 768px) {
     .start-options {
       flex-direction: column;

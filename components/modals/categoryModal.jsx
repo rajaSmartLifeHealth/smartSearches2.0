@@ -4,14 +4,15 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(""); // For error handling
+  const [error, setError] = useState("");
 
   const token = localStorage.getItem("authToken");
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
-      setError(""); // Clear any previous error when re-opening the modal
+      setError(""); // Clear error on open
+      setCategoryName(""); // Reset input field
 
       fetch(`${endpoint}/categories`, {
         method: "GET",
@@ -29,7 +30,6 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
     }
   }, [isOpen, endpoint, token]);
 
-  // Add a new category
   const handleAddCategory = () => {
     if (!categoryName.trim()) {
       setError("Category name cannot be empty.");
@@ -47,10 +47,10 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
     })
       .then((res) => res.json())
       .then((newCategory) => {
-        setCategories([...categories, newCategory]); // Add new category to the list
-        setCategoryName(""); // Clear the input field after adding the category
-        setError(""); // Clear any previous error
-        onSubmit && onSubmit(newCategory); // Call onSubmit if provided (for parent handling)
+        setCategories((prev) => [...prev, newCategory]);
+        setCategoryName(""); // Clear input field
+        setError(""); // Clear error message
+        if (onSubmit) onSubmit(newCategory); // Pass new category to parent
       })
       .catch((err) => {
         setError("Failed to add category.");
@@ -59,16 +59,15 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
       .finally(() => setIsLoading(false));
   };
 
-  // Delete a category
   const handleDeleteCategory = (id) => {
     setIsLoading(true);
     fetch(`${endpoint}/categories/${id}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`, // Include token for authorization
+        Authorization: `Bearer ${token}`,
       },
     })
-      .then(() => setCategories(categories.filter((cat) => cat._id !== id)))
+      .then(() => setCategories((prev) => prev.filter((cat) => cat._id !== id)))
       .catch((err) => {
         setError("Failed to delete category.");
         console.error(err);
@@ -76,12 +75,18 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
       .finally(() => setIsLoading(false));
   };
 
+  // Close modal and clear states when the modal is closed
+  const handleClose = () => {
+    setCategoryName("");
+    setError("");
+    closeModal();
+  };
+
   return isOpen ? (
     <div className="modal">
       <div className="modal-content">
         <h2>Manage Categories</h2>
 
-        {/* Error message display */}
         {error && <p className="error-message">{error}</p>}
 
         <input
@@ -105,7 +110,8 @@ export default function CategoryModal({ isOpen, closeModal, endpoint, onSubmit }
             </li>
           ))}
         </ul>
-        <button onClick={closeModal} disabled={isLoading}>
+
+        <button onClick={handleClose} disabled={isLoading}>
           Close
         </button>
       </div>

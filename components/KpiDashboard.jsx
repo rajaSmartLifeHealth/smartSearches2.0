@@ -10,7 +10,6 @@ export default function KpiDashboard() {
 
   const baseEndpoint = "https://backend-poc-tsp9.onrender.com/api/";
 
-  // Helper function for API calls
   const fetchData = async (endpoint) => {
     try {
       setLoading(true);
@@ -28,7 +27,6 @@ export default function KpiDashboard() {
     }
   };
 
-  // Initial data fetch for categories
   useEffect(() => {
     (async () => {
       const categories = await fetchData(`${baseEndpoint}categories`);
@@ -37,34 +35,33 @@ export default function KpiDashboard() {
     })();
   }, []);
 
-  // Handle tree item click
+  // Handle
   const handleItemClick = async (item) => {
     let endpoint;
     let newData = [];
 
-    if (breadcrumbs.length === 0) {
-      // Fetch records for the selected category
-      endpoint = `${baseEndpoint}records?categoryId=${item._id}`;
-      newData = await fetchData(endpoint);
-    } else if (breadcrumbs.length === 1) {
-      // Fetch practices for the selected record
-      endpoint = `${baseEndpoint}practices?recordId=${item._id}`;
-      newData = await fetchData(endpoint);
-    } else if (breadcrumbs.length === 2) {
-      // Fetch hospitals for the selected practice
-      endpoint = `${baseEndpoint}patients?practiceId=${item._id}`;
-      newData = await fetchData(endpoint);
-    } else if (breadcrumbs.length === 3) {
-      // Fetch patients and metrics for the selected hospital
-      endpoint = `${baseEndpoint}metrics?patientId=${item._id}`;
-      newData = await fetchData(endpoint);
+     if (breadcrumbs.length === 0) {
+         endpoint = `${baseEndpoint}records?categoryId=${item._id}`;
+        newData = await fetchData(endpoint);
+     } else if (breadcrumbs.length === 1) {
+        endpoint = `${baseEndpoint}practices?recordId=${item._id}`;
+
+        newData = await fetchData(endpoint);
+     } else if (breadcrumbs.length === 2) {
+
+        endpoint = `${baseEndpoint}patients?practiceId=${item._id}`;
+
+          newData = await fetchData(endpoint);
+       } else if (breadcrumbs.length === 3) {
+
+        endpoint = `${baseEndpoint}metrics?patientId=${item._id}`;
+          newData = await fetchData(endpoint);
     }
 
     setBreadcrumbs([...breadcrumbs, item]);
     setCurrentData(newData);
   };
 
-  // Handle back navigation
   const handleBack = () => {
     if (breadcrumbs.length === 0) return;
 
@@ -75,13 +72,13 @@ export default function KpiDashboard() {
     if (updatedBreadcrumbs.length === 0) {
       setCurrentData(data); // Back to categories
     } else {
-      // Fetch previous data
+      
       const previousItem = updatedBreadcrumbs[updatedBreadcrumbs.length - 1];
       handleItemClick(previousItem, true);
     }
   };
 
-  // Render breadcrumb navigation
+  
   const renderBreadcrumbs = () => (
     <div className="breadcrumbs">
       <button onClick={handleBack}>Back</button>
@@ -93,7 +90,6 @@ export default function KpiDashboard() {
     </div>
   );
 
-  // Render Metrics Table
   const renderMetricsTable = () => {
     return (
       <table>
@@ -126,7 +122,7 @@ export default function KpiDashboard() {
         <>
           {breadcrumbs.length > 0 && renderBreadcrumbs()}
           {currentData && currentData.length > 0 && currentData[0].patientName ? (
-            // Render the metrics table when data contains metrics
+           
             renderMetricsTable()
           ) : (
             <TreeViewComponent
